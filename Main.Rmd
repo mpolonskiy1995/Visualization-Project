@@ -259,9 +259,9 @@ Taking a look at figure 5 we can see, that the top hardware components, make up 
 
 Summing up this analysis we can say, that high performance CPUs appear with external GPUs which makes them a good buy. The same recommendation can be given out to i5 CPUs with UHD graphics. HD GPUs should be avoided at all costs, which could prove itself to be quite difficult since they seem to be found in devices most often.
 
-Now that we have identified the best Hardware components, we want to take a look at the manufactures, to identify which of them should be preferred.
+Now that we have identified the best Hardware components, we want to take a look at the manufacturers, to identify which of them should be preferred.
 
-# Taking a closer look at the manufacturer
+# Taking a closer look at the manufacturers
 
 ```{r, fig.width=20, fig.height=12}
 
@@ -270,6 +270,8 @@ data <- df %>% group_by(Company) %>% summarise(n = n(), PricePerformance = mean(
 fig6 <- data   %>%  ggplot(aes(x=Company, y=(PricePerformance), fill=Company, color=Company)) +
    
                     geom_bar(stat="identity") + 
+                    
+                    geom_label(aes(label=round(PricePerformance,2)), fill="white", color="black") +   
    
                     labs(title = "Figure 6: Companies by Price Performance Ratio", fill="Company", color="Company", y="Price Performance Ratio", x="Company") +
   
@@ -293,14 +295,17 @@ ggarrange(fig6,fig7)
 
 ```
 
+Investigating figure 6, we see all companies ranked by their price performance ratio, it is easy to see, that MSI is by far the best choice with regards to price performance with 25.4 euro/point. The second best choice is Acer, however the gap between to MSI is quite large, with Acer being at 54.45 euro/point. Coming in third by a close margin to Acer is Asus with 59.06 euro/point. All other companies have significantly higher values, with Toshiba being last.
 
-
-
-
+Moving on to figure 7, we can observe, which price segments companies target, by comparing the density of a given graph to the price range. Starting off with MSI we can see, that it has high density in the area of roughly 1200 - 2500 euro. Taking into consideration its excellent price performance ratio, this shows, that MSI targets mainly customers who want very good performance but do not want to overspend on it. These laptops usually include high performance CPU and an external GPU, which as shown before is a very preferable combination in terms of price performance ratio. Nevertheless these components are not cheap to begin with, therefore the general price segment is fairly high situated. Acer on the other hand favors the low budget segment, indicated by its high density peak around 1000 euro. This suggests that Acer might use UHD GPUs and certainly installs the cheaper i5 CPUs. With regards to the other companies we can say, that their distribution also centers around cheaper laptops, still their plots are more spread out, indicating a broader targeting strategy.
 
 
 # Summary
 
+Summing up our results we can say, that we have analyzed the laptop landscape thoroughly and identified several key features for which one should look out, if the time has come to buy a new device. First and foremost performance does increase with price, however getting a good CPU is much easier and cheaper, than finding a decent GPU. Buyers how try to get the biggest bang for their buck should therefore look out for Intels UHD GPU series, since it is unrivaled in terms of its price performance ratio. In general if a light laptop with an energy efficient CPU is needed, i5 CPUs should be preferred, unless extra computing power is absolutely necessary. If a larger budget is available laptops with a high performance CPU (HQ) as well as with a dedicated GPU should be considered. Lastly when choosing a device with respect to the manufacturer, MSI is the best choice for greater investments that will last a long time, whereas Acer should be considered if pricing is key.
+
+Note: Although this article offers a solid recommendation on which device to buy, several observations should be kept in mind: 
+Due to some difficulties with regards to data acquisition and preparation, not all major companies present in the market have been analyzed. Especially Apple devices which are quite popular, have been left out, due to insufficient data points. Moreover with regards to hardware specifications Intel is the dominating manufacturer, therefore most of this analysis has focused on its vast product lineup. However amd is becoming more dominant in recent time, therefore a follow up article with a detailed investigation of amd hardware is to be expected.
 
 
 
