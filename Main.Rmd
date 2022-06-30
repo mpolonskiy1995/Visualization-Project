@@ -1,8 +1,8 @@
 ---
-title: "Visualization Project"
+title: "Visualisation Project"
 author: "Michael Polonskiy"
-date: "`r format(Sys.time(), "%Y-%m-%d")`"  
-output: 
+date: "`r format(Sys.time(), '%Y-%m-%d')`"
+output:
   html_document:
     toc: true
     toc_float: true
@@ -11,6 +11,11 @@ output:
     highlight: tango
     number_sections: false
 ---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
 
 
 ## Topic and Scope
@@ -26,7 +31,7 @@ Note: All necessary files are provided within this GitHub Repository. The used d
 * GPU Benchmarks Compilation: https://www.kaggle.com/datasets/alanjo/gpu-benchmarks
 
 
-```{r libraries}
+```{r}
 # Libraries
 library(reticulate)
 library(tidyverse)
@@ -91,14 +96,14 @@ Although Pre-processing is done in python we will create the main metrics used i
 ```{r}
 #Main Theme object and colors
 
- theme <- theme_bw() + theme(plot.title = element_text(hjust = 0.5), plot.title.position = 'panel', text = element_text(size = 13, color="black"), axis.text.x = element_text(size = 13, color="black"),  axis.text.y = element_text(size = 13, color="black"),  axis.title.y = element_text(size = 14, color="black"),  axis.title.x = element_text(size = 14, color="black"), legend.title=element_text(size = 14, color="black"), legend.text=element_text(size = 13, color="black")) 
+theme <- theme_bw() + theme(plot.title = element_text(hjust = 0.5), plot.title.position = 'panel', text = element_text(size = 13, color="black"), axis.text.x = element_text(size = 13, color="black"),  axis.text.y = element_text(size = 13, color="black"),  axis.title.y = element_text(size = 14, color="black"),  axis.title.x = element_text(size = 14, color="black"), legend.title=element_text(size = 14, color="black"), legend.text=element_text(size = 13, color="black")) 
 
 colorsinv = c("green4", "green1", "yellow3","red1", "red4")
 colors = c("red4", "red1", "yellow3", "green1", "green4")
 
 ```
 
-## CPU,GPU ~ Price
+## Influences of GPU and CPU on Price
 
 With this information at hand we want to take a closer look, on the defined performance measures and their influence on a device. First of all we want to inspect how GPU and CPU influence laptop prices and how they influence each other:
 
@@ -142,9 +147,7 @@ Looking at the diagram above, we can see our defined metrics, ranging from 0 to 
 It is obvious that devices with a lower score at both metrics will be in a cheaper range, e.g. the Lifebook A557. At the far end of the plot, in the upper right corner we can see premium laptops, ranking high in both categories and costing a little fortune, like the DELL Alienware series for gaming. However what is most interesting to see, is that there is a trade off with regards to price when considering mainly one of the two metrics. Points in the upper left corner indicate laptops with a high CPU performance, still under 1000 euros. The same goes for devices in the lower right part of the graph, showing an increased GPU rating but moderate pricing. Comparing these two sections we can observe, that high CPU power can be achieved much cheaper than GPU power. GPU seems to be the main factor for driving the cost and after a certain threshold, upgrading GPU does not change the CPU performance, only the price will rise. Therefore our main observation is, that when considering to buy a new device, high CPU is desirable, whereas good GPU performance comes with a lot of cost. It is worth spending a couple of hundred euros more, getting a significantly better CPU, but it could be wise, to save on GPU when not necessarily needed.
 
 
-## Total Ranking Score grouped ~ Price
-
-```{r, fig.width=12, fig.height=12}
+```{r, fig.width=10, fig.height=10}
 
 data <- df %>% group_by(RatingBin) %>% summarise(price_mean = mean(Price_euros), price_sd=sd(Price_euros), n=n()) %>% filter(n > 10)
 
@@ -157,7 +160,7 @@ data %>%
   
   geom_smooth(smoothing=FALSE) +  
   
-  labs(title = "Figure 2: Relation between priceand Ranking Score grouped in ranges of 10", color="Price", size="Price", x="Ranking Score Group", y="Price") +
+  labs(title = "Figure 2: Relation between price and Ranking Score grouped in ranges of 10", color="Price", size="Price", x="Ranking Score Group", y="Price") +
   
   theme
 
@@ -165,16 +168,18 @@ data %>%
 
 Taking this observation one step further we now look at the total ranking score of both metrics combined. We want to investigate the overall trend of the ranking score on the price, thereby cross validating the stability of our results. We divide the ranking score in bins ranging from 1-10, representing one category of similar devices when measured in performance. Looking at the second diagram, we can see, that with rising ranking score group the price of devices increases. However the displayed curve reveals, that for the first 4 ranking groups increase in price is only marginal, only after group 5 can we note a step increase in price with rising performance. This supports our initial finding: buying a cheap laptop is not always the best choice. There is a threshold up to which extra performance comes with little cost, although as shown in figure 1 this is mainly true for extra CPU performance. Moreover looking at the confidence interval of price in our calculated ranking groups, we can notice a fluctuation of roughly 300 euro which is quite similar throughout all our groups. This means, that the found trend and the recognition of a performance ~ price optimum is quite stable, since deviation does not alter much throughout the groups. Nevertheless the deviation value itself is quite large per group, which shows, that especially for lower prices very good offers exist. Note: One ranking score group is missing, which indicates that not sufficient data points exist for this category. This problem could be motivated by collecting more data or binning differently, however it might as well be, that laptops of this performance rank are very scarce. This needs further investigation.
 
-## Finding the right CPU and GPU
+# Finding the right CPU and GPU
+
+## Investigating CPUs
 
 Knowing now that there exists an optimum when buying a laptop the logical question of the intrigued buyer will be: "How do I recognize this sweet spot? Which CPU / GPU should I know buy?" To answer this question we want to investigate the most common CPUs and GPUs in laptops and see which of them display the best price-performance ratio. Therefore we introduce a new metric: price-performance ratio, this metric tells us how much one point of standardized performance (1-100) will cost us with a specific device.
 
-```{r, fig.width=12, fig.height=12}
+```{r, fig.width=12, fig.height=9}
 topn <- 10
 total <- count(df)$n
 
 dataCPU <- df %>% group_by(Cpu) %>% summarise(n=n(), meanPricePerformance = mean(PricePerformance)) %>% arrange(desc(n)) %>% 
-            group_by(Cpu = factor(c(Cpu[1:topn ], rep("Other", n() - topn)), levels=c("Other",Cpu[topn:1]))) %>% group_by(Cpu) %>%
+            group_by(Cpu = factor(c(Cpu[1:topn ], rep("Other", n() - topn)), levels=c("Other",Cpu[topn:1])))  %>%
             summarise(n=sum(n) , meanPricePerformance = mean(meanPricePerformance), percentage=n/total * 100)  %>% arrange(desc(n))
   
   
@@ -195,11 +200,12 @@ dataCPU %>%  ggplot(aes(x=Cpu, y=percentage, fill=meanPricePerformance)) +
 
 Turning first to CPUs, we can see in figure 3, the top 10 most used CPUs in laptops ranked by their occurence. The color indicates the price-performance ratio, with green being the least amount of euros spent for one score point of performance. It is easy to see, that the first 3 CPUs make up almost half of the entire distribution. This means that most laptops bought will have one of these 3 CPUs. Taking a closer look at the results we can observe, that when it comes to energy efficient CPUs, labeled with the index "U" i5 CPUs are always better in terms of price-performance ratio than i7 CPUs (roughly 35 euro/point for i5 7200U vs about 85 euro/point for i7 7500U). However high performance CPUs, labeled with an "HQ" suffix are the best choice in terms of price-performance ratio (25 euro/point for i7 7700 HQ). Therefore if a new laptop is considered always look out for high performance series CPU. If battery is of the essence, i5 should be chosen over i7.
 
+## Investigating GPUs
 
-```{r, fig.width=12, fig.height=12}
+```{r, fig.width=12, fig.height=9}
 dataGPU <- df %>% group_by(Gpu) %>% summarise(n=n(), meanPricePerformance = mean(PricePerformance)) %>% arrange(desc(n)) %>%
             group_by(Gpu = factor(c(Gpu[1:topn ], rep("Other", n() - topn)), levels=c("Other",Gpu[topn:1]))) %>% 
-            group_by(Gpu) %>% summarise(n=sum(n) , meanPricePerformance = mean(meanPricePerformance), percentage=n/total * 100)  %>% arrange(desc(n))
+            summarise(n=sum(n) , meanPricePerformance = mean(meanPricePerformance), percentage=n/total * 100)  %>% arrange(desc(n))
   
   
 dataGPU %>% ggplot(aes(x=Gpu, y=percentage, fill=meanPricePerformance)) +
@@ -220,18 +226,18 @@ Turning now to GPU analysis, we can see the same kind of plot depicted for GPUs,
 
 Using our results from these two analysis we can safely pose the question: Which is the Hardware combination which occurs most frequent in laptops sold and which of these combinationsa re now desirable, based on our knowledge?
 
+## Bringing it all together: Investigating Hardware
 
-
-```{r, fig.width=12, fig.height=12}
+```{r, fig.width=12, fig.height=9}
 subset <- df %>% group_by(combinations) %>% summarise(n=n(), meanPricePerformance = mean(PricePerformance)) %>% arrange(desc(n)) %>% 
                  group_by(combinations = factor(c(combinations[1:topn ], rep("Other", n() - topn)), levels=c("Other",combinations[topn:1]))) %>% 
-                 group_by(combinations) %>% summarise(n=sum(n) , meanPricePerformance = mean(meanPricePerformance), percentage=n/total * 100)  %>% arrange(desc(n)) %>% top_n(5)
+                 summarise(n=sum(n) , meanPricePerformance = mean(meanPricePerformance), percentage=n/total * 100)  %>% arrange(desc(n)) %>% top_n(5)
 
 
 
 data <- df %>% group_by(combinations) %>% summarise(n=n(), meanPricePerformance = mean(PricePerformance)) %>% arrange(desc(n)) %>% 
         group_by(combinations = factor(c(combinations[1:topn ], rep("Other", n() - topn)), levels=c("Other",combinations[topn:1]))) %>% 
-        group_by(combinations) %>% summarise(n=sum(n) , meanPricePerformance = mean(meanPricePerformance), percentage=n/total * 100)  %>% arrange(desc(n)) 
+        summarise(n=sum(n) , meanPricePerformance = mean(meanPricePerformance), percentage=n/total * 100)  %>% arrange(desc(n)) 
 
 data %>% ggplot(aes(x=combinations, y=percentage, fill=meanPricePerformance)) + 
   
@@ -249,7 +255,43 @@ data %>% ggplot(aes(x=combinations, y=percentage, fill=meanPricePerformance)) +
 ```
 
 
-Taking
+Taking a look at figure 5 we can see, that the top hardware components, make up significantly less than 50% of all hardware installed. This indicates that although there are favorites when looking at the components separately, there is no standard selling configuration. Therefore the group "others" which denote all other possible configurations is a lot larger than when looking at the other two graphs (45.16 %). However turning to the top configuration with 15.24 % selling rate we can observe a mediocre price performance ratio of around 65 euro/point. Considering our results from before  we can explain this, by the usage of the Intel 620 HD which is quite bad in terms of ratio. Although the CPU is decent, the overall score gets diluted by the bad GPU. Turning to the second and third most sold configurations, the trend only strengthens with know less preferable CPUs and still undesirable GPUs the price performance ratio is more than 110 euro/point. However combinations of high performance CPus and external GPUs perform very good (< 30 euro/point) as is to be expected from their separate analysis. Moreover when used the UHD onboard GPU also yields a preferable ratio (< 30 euro/point).
+
+Summing up this analysis we can say, that high performance CPUs appear with external GPUs which makes them a good buy. The same recommendation can be given out to i5 CPUs with UHD graphics. HD GPUs should be avoided at all costs, which could prove itself to be quite difficult since they seem to be found in devices most often.
+
+Now that we have identified the best Hardware components, we want to take a look at the manufactures, to identify which of them should be preferred.
+
+# Taking a closer look at the manufacturer
+
+```{r, fig.width=20, fig.height=12}
+
+data <- df %>% group_by(Company) %>% summarise(n = n(), PricePerformance = mean(PricePerformance), sd = sd(PricePerformance)) %>% filter(n > 10)
+
+fig6 <- data   %>%  ggplot(aes(x=Company, y=(PricePerformance), fill=Company, color=Company)) +
+   
+                    geom_bar(stat="identity") + 
+   
+                    labs(title = "Figure 6: Companies by Price Performance Ratio", fill="Company", color="Company", y="Price Performance Ratio", x="Company") +
+  
+                    theme
+
+
+data <- df %>% group_by(Company) %>% summarise(n = n()) %>% merge(df) %>% filter(n > 10)
+  
+  
+fig7 <- data %>% ggplot(aes(Price_euros, fill=Company, color=Company)) +
+   
+                 geom_density() + facet_wrap(~ Company) +   
+  
+                 labs(title = "Figure 7: Companies by Price Density Plot", fill="Company", color="Company", y="", x="Price in €") +
+  
+                 theme
+
+
+ggarrange(fig6,fig7)
+ 
+
+```
 
 
 
@@ -257,8 +299,7 @@ Taking
 
 
 
-
-
+# Summary
 
 
 

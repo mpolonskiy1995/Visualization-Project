@@ -193,7 +193,7 @@ geom_bar(stat="identity")
 ```
 ```{r, fig.width=16, fig.height=10}
 df  %>%  filter(Company == c("MSI","Asus", "Dell", "Acer","Lenovo","HP","Toshiba")) %>%  ggplot(aes(Price_euros, fill=Company, color=Company)) +
-  geom_density(alpha = 0.3) + facet_wrap(vars(Company))
+  geom_density() + facet_wrap(vars(Company))
 ```
 
 
@@ -213,8 +213,36 @@ df %>% group_by(OpSys) %>% summarise(price_mean = mean(PricePerformance), price_
 
 
 ```{r}
-
 df %>%   ggplot(aes(x=Price_euros, y=ScaledRating)) + geom_line(stat="identity") 
+```
+
+
+```{r}
+subset <- df %>% group_by(combinations) %>% summarise(n=n(), meanPricePerformance = mean(PricePerformance)) %>% arrange(desc(n)) %>% 
+                 group_by(combinations = factor(c(combinations[1:topn ], rep("Other", n() - topn)), levels=c("Other",combinations[topn:1]))) %>% summarise(n=sum(n) , meanPricePerformance = mean(meanPricePerformance), percentage=n/total * 100)  %>% arrange(desc(n)) %>% top_n(5)
+
+
+
+data <- df %>% group_by(combinations) %>% summarise(n=n(), meanPricePerformance = mean(PricePerformance)) %>% arrange(desc(n)) %>% 
+        group_by(combinations = factor(c(combinations[1:topn ], rep("Other", n() - topn)), levels=c("Other",combinations[topn:1]))) %>% 
+        group_by(combinations) %>% summarise(n=sum(n) , meanPricePerformance = mean(meanPricePerformance), percentage=n/total * 100)  %>% arrange(desc(n)) 
+
+data %>% ggplot(aes(x=combinations, y=percentage, fill=meanPricePerformance)) + 
+  
+         geom_bar(stat="identity") + coord_flip() +  scale_fill_gradientn(colors = colorsinv, n.breaks= 5) +
+  
+         geom_label(aes(label=round(percentage,2)), fill="white") +   
+  
+         labs(title = "Figure 5: Top 10 used Hardware Specs with Price Performance Ratio", fill="Price Performance\nRatio", y="Percentage of usage in Devices", x="Hardware") +
+  
+         theme
+
+```
+
+
+
+
+
 
 
 
