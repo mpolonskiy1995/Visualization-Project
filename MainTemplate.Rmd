@@ -52,6 +52,8 @@ library(scales)
 ```
 
 
+Although Pre-processing is done in python we will create the main metrics used in this analysis in r, since it is easier to use the functions provided in r for this task once the dataset is pre-processed.
+
 ```{r}
 df$ScaledRating <- rescale((0.5 * scale(df$ProcessorRating, center=FALSE) + 0.25 * scale(df$G2Dmark, center=FALSE) + 0.25 * scale(df$G3Dmark, center=FALSE)), to=c(1,100))
 df$PricePerformance <- ( df$Price_euros / df$ScaledRating ) 
@@ -208,4 +210,12 @@ df %>% group_by(OpSys) %>% summarise(price_mean = mean(PricePerformance), price_
 
 
 ```
+
+
+```{r}
+
+df %>%   ggplot(aes(x=Price_euros, y=ScaledRating)) + geom_line(stat="identity") 
+
+
+
 

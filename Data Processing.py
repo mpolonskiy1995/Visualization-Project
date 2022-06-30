@@ -100,7 +100,6 @@ df["Cpu"] = df["Cpu"].str.strip()
 df = df.merge(cpu, how='left', left_on="Cpu" ,right_on="Processor")
 
 
-
 # Filtering out desktop gpus since we only consider laptops
 gpu = gpu.loc[gpu.category != 'Desktop'].copy()
 # Reshaping gpuName for mapping
