@@ -96,7 +96,11 @@ Although Pre-processing is done in python we will create the main metrics used i
 ```{r}
 #Main Theme object and colors
 
-theme <- theme_bw() + theme(plot.title = element_text(hjust = 0.5), plot.title.position = 'panel', text = element_text(size = 13, color="black"), axis.text.x = element_text(size = 13, color="black"),  axis.text.y = element_text(size = 13, color="black"),  axis.title.y = element_text(size = 14, color="black"),  axis.title.x = element_text(size = 14, color="black"), legend.title=element_text(size = 14, color="black"), legend.text=element_text(size = 13, color="black")) 
+size <- 15
+theme <- theme_bw(base_size = 15) + theme(plot.title = element_text(hjust = 0.5, size = 22, color="black"),  plot.title.position = 'panel', text = element_text(size = size, color="black"), 
+                            axis.text.x = element_text(size = size, color="black"),  axis.text.y = element_text(size = size, color="black"),  
+                            axis.title.y = element_text(size = size, color="black"),  axis.title.x = element_text(size = size, color="black"), 
+                            legend.title=element_text(size = size, color="black"), legend.text=element_text(size = size, color="black")) 
 
 colorsinv = c("green4", "green1", "yellow3","red1", "red4")
 colors = c("red4", "red1", "yellow3", "green1", "green4")
@@ -107,7 +111,7 @@ colors = c("red4", "red1", "yellow3", "green1", "green4")
 
 With this information at hand we want to take a closer look, on the defined performance measures and their influence on a device. First of all we want to inspect how GPU and CPU influence laptop prices and how they influence each other:
 
-```{r, fig.width=12, fig.height=12}
+```{r, fig.width=12, fig.height=10}
 subset <- bind_rows(df %>% group_by(Product) %>%  summarise(Priced_euros=mean(Price_euros),ScaledGPU=mean(ScaledGPU), ScaledCPU=mean(ScaledCPU)) %>% arrange(-Priced_euros) %>% head(5), 
                     df %>% group_by(Product) %>%  summarise(Priced_euros=mean(Price_euros),ScaledGPU=mean(ScaledGPU), ScaledCPU=mean(ScaledCPU)) %>% arrange(Priced_euros) %>% slice(81:85))
 
@@ -128,7 +132,7 @@ df %>%  ggplot(aes(x=ScaledGPU, y=ScaledCPU)) +
   
         theme(plot.title = element_text(hjust = 0.5), plot.title.position = 'panel') +
 
-        geom_label_repel( data=subset, aes(label = Product), size = 5, color = alpha("black", 0.8),
+        geom_label_repel( data=subset, aes(label = Product), size = 6, color = alpha("black", 0.8),
                     force = 50, seed = 20, min.segment.length = 0.1, segment.curvature = -0.4, 
                     segment.size = 1, segment.color = "black", arrow = arrow(length = unit(0.015, "npc"),
                     ends = "last", type = "closed"), fill = alpha("transparent", .3), max.overlaps = 10)  +  
@@ -147,7 +151,7 @@ Looking at the diagram above, we can see our defined metrics, ranging from 0 to 
 It is obvious that devices with a lower score at both metrics will be in a cheaper range, e.g. the Lifebook A557. At the far end of the plot, in the upper right corner we can see premium laptops, ranking high in both categories and costing a little fortune, like the DELL Alienware series for gaming. However what is most interesting to see, is that there is a trade off with regards to price when considering mainly one of the two metrics. Points in the upper left corner indicate laptops with a high CPU performance, still under 1000 euros. The same goes for devices in the lower right part of the graph, showing an increased GPU rating but moderate pricing. Comparing these two sections we can observe, that high CPU power can be achieved much cheaper than GPU power. GPU seems to be the main factor for driving the cost and after a certain threshold, upgrading GPU does not change the CPU performance, only the price will rise. Therefore our main observation is, that when considering to buy a new device, high CPU is desirable, whereas good GPU performance comes with a lot of cost. It is worth spending a couple of hundred euros more, getting a significantly better CPU, but it could be wise, to save on GPU when not necessarily needed.
 
 
-```{r, fig.width=10, fig.height=10}
+```{r, fig.width=10, fig.height=7}
 
 data <- df %>% group_by(RatingBin) %>% summarise(price_mean = mean(Price_euros), price_sd=sd(Price_euros), n=n()) %>% filter(n > 10)
 
@@ -160,7 +164,7 @@ data %>%
   
   geom_smooth(smoothing=FALSE) +  
   
-  labs(title = "Figure 2: Relation between price and Ranking Score grouped in ranges of 10", color="Price", size="Price", x="Ranking Score Group", y="Price") +
+  labs(title = "Figure 2: Relation between price and Ranking Score\nGrouped in ranges of 10", color="Price", size="Price", x="Ranking Score Group", y="Price") +
   
   theme
 
@@ -174,7 +178,7 @@ Taking this observation one step further we now look at the total ranking score 
 
 Knowing now that there exists an optimum when buying a laptop the logical question of the intrigued buyer will be: "How do I recognize this sweet spot? Which CPU / GPU should I know buy?" To answer this question we want to investigate the most common CPUs and GPUs in laptops and see which of them display the best price-performance ratio. Therefore we introduce a new metric: price-performance ratio, this metric tells us how much one point of standardized performance (1-100) will cost us with a specific device.
 
-```{r, fig.width=12, fig.height=9}
+```{r, fig.width=14, fig.height=9}
 topn <- 10
 total <- count(df)$n
 
@@ -189,7 +193,7 @@ dataCPU %>%  ggplot(aes(x=Cpu, y=percentage, fill=meanPricePerformance)) +
   
         scale_fill_gradientn(colors = colorsinv, n.breaks= 5) + 
   
-        geom_label(aes(label=round(percentage,2)), fill="white") +  
+        geom_label(aes(label=round(percentage,2)), fill="white", size=6) +  
   
         labs(title = "Figure 3: Top 10 used CPUs with Price Performance Ratio", fill="Price Performance\nRatio", y="Percentage of usage in Devices", x="CPU") +
   
@@ -202,7 +206,7 @@ Turning first to CPUs, we can see in figure 3, the top 10 most used CPUs in lapt
 
 ## Investigating GPUs
 
-```{r, fig.width=12, fig.height=9}
+```{r, fig.width=14, fig.height=9}
 dataGPU <- df %>% group_by(Gpu) %>% summarise(n=n(), meanPricePerformance = mean(PricePerformance)) %>% arrange(desc(n)) %>%
             group_by(Gpu = factor(c(Gpu[1:topn ], rep("Other", n() - topn)), levels=c("Other",Gpu[topn:1]))) %>% 
             summarise(n=sum(n) , meanPricePerformance = mean(meanPricePerformance), percentage=n/total * 100)  %>% arrange(desc(n))
@@ -214,7 +218,7 @@ dataGPU %>% ggplot(aes(x=Gpu, y=percentage, fill=meanPricePerformance)) +
   
         scale_fill_gradientn(colors = colorsinv, n.breaks= 5) + 
   
-        geom_label(aes(label=round(percentage,2)), fill="white") +  
+        geom_label(aes(label=round(percentage,2)), fill="white", size=6) +  
   
         labs(title = "Figure 4: Top 10 used GPUs with Price Performance Ratio", fill="Price Performance\nRatio", y="Percentage of usage in Devices", x="GPU") +
   
@@ -228,7 +232,7 @@ Using our results from these two analysis we can safely pose the question: Which
 
 ## Bringing it all together: Investigating Hardware
 
-```{r, fig.width=12, fig.height=9}
+```{r, fig.width=14, fig.height=9}
 subset <- df %>% group_by(combinations) %>% summarise(n=n(), meanPricePerformance = mean(PricePerformance)) %>% arrange(desc(n)) %>% 
                  group_by(combinations = factor(c(combinations[1:topn ], rep("Other", n() - topn)), levels=c("Other",combinations[topn:1]))) %>% 
                  summarise(n=sum(n) , meanPricePerformance = mean(meanPricePerformance), percentage=n/total * 100)  %>% arrange(desc(n)) %>% top_n(5)
@@ -243,7 +247,7 @@ data %>% ggplot(aes(x=combinations, y=percentage, fill=meanPricePerformance)) +
   
          geom_bar(stat="identity") + coord_flip() +  scale_fill_gradientn(colors = colorsinv, n.breaks= 5) +
   
-         geom_label(aes(label=round(percentage,2)), fill="white") +   
+         geom_label(aes(label=round(percentage,2)), fill="white", size=6) +   
   
          labs(title = "Figure 5: Top 10 used Hardware Specs with Price Performance Ratio", fill="Price Performance\nRatio", y="Percentage of usage in Devices", x="Hardware") +
   
@@ -263,7 +267,17 @@ Now that we have identified the best Hardware components, we want to take a look
 
 # Taking a closer look at the manufacturers
 
-```{r, fig.width=20, fig.height=12}
+```{r}
+size <- 28
+theme2 <- theme_bw(base_size = 15) + theme(plot.title = element_text(hjust = 0.5, size = size, color="black"),  plot.title.position = 'panel', text = element_text(size = size, color="black"), 
+                            axis.text.x = element_text(size = size, color="black"),  axis.text.y = element_text(size = size, color="black"),  
+                            axis.title.y = element_text(size = size, color="black"),  axis.title.x = element_text(size = size, color="black"), 
+                            legend.title=element_text(size = size, color="black"), legend.text=element_text(size = size, color="black"), strip.text.x = element_text(size = size)) 
+
+```
+
+
+```{r, fig.width=30, fig.height=12}
 
 data <- df %>% group_by(Company) %>% summarise(n = n(), PricePerformance = mean(PricePerformance), sd = sd(PricePerformance)) %>% filter(n > 10)
 
@@ -271,11 +285,11 @@ fig6 <- data   %>%  ggplot(aes(x=Company, y=(PricePerformance), fill=Company, co
    
                     geom_bar(stat="identity") + 
                     
-                    geom_label(aes(label=round(PricePerformance,2)), fill="white", color="black") +   
+                    geom_label(aes(label=round(PricePerformance,2)), fill="white", color="black", size=10) +   
    
                     labs(title = "Figure 6: Companies by Price Performance Ratio", fill="Company", color="Company", y="Price Performance Ratio", x="Company") +
   
-                    theme
+                    theme2 
 
 
 data <- df %>% group_by(Company) %>% summarise(n = n()) %>% merge(df) %>% filter(n > 10)
@@ -287,7 +301,7 @@ fig7 <- data %>% ggplot(aes(Price_euros, fill=Company, color=Company)) +
   
                  labs(title = "Figure 7: Companies by Price Density Plot", fill="Company", color="Company", y="", x="Price in €") +
   
-                 theme
+                 theme2 + theme(axis.text.x = element_text(size = 25, color="black"))
 
 
 ggarrange(fig6,fig7)
@@ -306,14 +320,3 @@ Summing up our results we can say, that we have analyzed the laptop landscape th
 
 Note: Although this article offers a solid recommendation on which device to buy, several observations should be kept in mind: 
 Due to some difficulties with regards to data acquisition and preparation, not all major companies present in the market have been analyzed. Especially Apple devices which are quite popular, have been left out, due to insufficient data points. Moreover with regards to hardware specifications Intel is the dominating manufacturer, therefore most of this analysis has focused on its vast product lineup. However amd is becoming more dominant in recent time, therefore a follow up article with a detailed investigation of amd hardware is to be expected.
-
-
-
-
-
-
-
-
-
-
-
