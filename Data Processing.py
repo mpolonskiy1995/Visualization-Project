@@ -9,8 +9,15 @@ gpu = pd.read_csv("Data/GPU_benchmarks_v5.csv", header=[0], sep=",", decimal="."
 
 # Pre-Processing
 
-def setGB (value):    
+def setGB (value):
+  """Function for converting memory feature from string to numeric value in GB
 
+    Args:
+        value (string): The string containing the memory value
+
+    Returns: 
+        numeric: Memory value in GB
+  """
   if isinstance(value, str):
     if ('GB' in value):
       return int(float(re.search('(.*)GB',value).group(1)))
@@ -20,6 +27,14 @@ def setGB (value):
     
     
 def setHarddrive (value):
+  """Function for setting the dummy variables determining if memory is HDD or SSD
+        
+       Args: 
+           value (string): The string containing the memory value
+
+    Returns:
+        list: A list containing two values, the first value represents HDD the second SSD'
+  """
   if isinstance(value, str):
     if ('HDD' in value):
       return [1,0]
@@ -95,32 +110,25 @@ gpu.rename({'G3Dmark' : 'GpuScore1','G2Dmark': 'GpuScore2' }, axis=1)
 
 # Formatting GPU column for merge
 df["Gpu"] = df["Gpu"].str.strip()
-
 df = df.merge(gpu, how='left', left_on="Gpu" ,right_on="gpuName")
 
+
+# Creating new dataframe with selected columns and no emtpty values. 
 df = df.sort_values(by="Price_euros", ascending=True).copy()
 df = df.drop_duplicates(subset=['Key'], keep='first').copy()
 
-
+# Filling na for created columns indicating type of memory
 df[['Memory2', 'Memory1HDD', 'Memory1SSD',
        'Memory2HDD', 'Memory2SSD']] = df[['Memory2', 'Memory1HDD', 'Memory1SSD',
        'Memory2HDD', 'Memory2SSD']].fillna(0)
 
+# Dropping na values
 df = df[['Company', 'Product', 'TypeName','Display',
        'ScreenResolution', 'Cpu', 'Memory', 'Gpu', 'OpSys','Key','Inches',
        'Ram','Weight', 'Price_euros', 'ProcessorRating','G3Dmark','G2Dmark', 'Memory1', 'Memory2',
        'Memory1HDD', 'Memory1SSD', 'Memory2HDD', 'Memory2SSD','testDate']].dropna()
 
-
+# Resetting index to key column
 df.set_index('Key', inplace=True)
 
-def yearAdjust (value):
-  if value == 2019:
-    return 2018
-  if value == 2020:
-    return 2019
-  else:
-    return value
-  
 
-df['testDate'] = df.apply(lambda x:  yearAdjust(x['testDate']), axis=1,result_type='expand')

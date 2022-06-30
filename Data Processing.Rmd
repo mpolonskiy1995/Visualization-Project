@@ -164,4 +164,7 @@ df['testDate'] = df.apply(lambda x:  yearAdjust(x['testDate']), axis=1,result_ty
 
 
 
+```{python}
+df["Cpu"] = df["Cpu"].str[:-1]
+```
 
