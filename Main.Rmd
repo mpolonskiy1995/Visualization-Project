@@ -18,7 +18,7 @@ knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 ```
 
 
-## Topic and Scope
+# Topic and Scope
 In the digital era electronic devices have become indispensable. From our smartphone to our electronic washing machine, all our lives virtually depend on these little helpers. However at the core of all this transition lies the computer, which nowadays is the most important tool for getting work done. Almost no job can be executed properly without one. Long gone are the days of big, heavy stay at home computers, modern portable laptops are dominating the entire landscape. With these thoughts at hand it is time to dig a little bit deeper, into the different companies that build these marvelous devices and analyze what criteria determine their price and performance.
 
 Therefore we collected data reflecting roughly 900 different models of the recent years with their hardware configuration and manufacturer information. Since it is quite difficult to compare models utilizing different components, we extended the given information by recognized CPU and GPU benchmarks, rating each component for its performance. In order to improve readability and understanding of these metrics, which are usually in a specific scale, chosen by the benchmarking system, we scaled and converted these metrics to a range of 1 to 100, where 100 is the best possible result a hardware component can achieve. Moreover we combined the two main rating scores for CPU and GPU units to a new metric, which qualifies the overall laptop hardware performance on a range from 1 to 100 respectively.
@@ -103,7 +103,7 @@ colors = c("red4", "red1", "yellow3", "green1", "green4")
 
 ```
 
-## Influences of GPU and CPU on Price
+# Influences of GPU and CPU on Price
 
 With this information at hand we want to take a closer look, on the defined performance measures and their influence on a device. First of all we want to inspect how GPU and CPU influence laptop prices and how they influence each other:
 
